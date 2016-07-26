@@ -124,6 +124,21 @@ UmlClass.prototype = {
     this._group.addChild(newText);
   },
 
+  moveToOrigin: function() {
+    var group = this._group;
+    group.position.x = group.bounds.width / 2;
+    group.position.y = group.bounds.height / 2;
+  },
+
+  getSvgString: function() {
+    var svg = umlClass._group.exportSVG({asString: true});
+    var svgText = "<svg xmlns=\"http://www.w3.org/2000/svg\" version=\"1.1\" "
+      + "height=\"" + this._group.bounds.height + "\" "
+      + "width=\"" + this._group.bounds.width + "\">"
+      + svg + "</svg>";
+    return svgText;
+  },
+
   onKeyDown: function(event) {
     this._group.position = view.center;
   }
@@ -149,25 +164,27 @@ var umlClass = new UmlClass('test');
 // myPath.add(new Point(50, 50));
 umlClass.addAttribute('Id', 'int');
 umlClass.addOperation('GetId', '', 'int');
+umlClass.moveToOrigin();
 
-var svg = umlClass._group.exportSVG({asString: true});
 var svgDiv = document.createElement("div");
-svgDiv.innerHTML = svg;
-console.log(svg);
+svgDiv.id = 'svgText';
+svgDiv.innerHTML = umlClass.getSvgString();
+console.log(svgDiv.innerHTML);
 document.getElementsByTagName('body')[0].appendChild(svgDiv);
 
 function onKeyDown(event) {
-  umlClass.onKeyDown(event);
+  //umlClass.onKeyDown(event);
   //console.log(text + rectangle + rectangle2);
   // group.position = view.center;
   // addText();
   // group.width = group.with + 10;
+  umlClass.moveToOrigin();
 }
 
 function onResize(event) {
   // Whenever the window is resized, recenter the path:
   //group.position = view.center;
-  umlClass.onResize(event);
+  //umlClass.onResize(event);
 }
 
 function addText() {

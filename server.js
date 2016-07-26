@@ -1,6 +1,7 @@
 var express    = require('express');        // call express
 var app        = express();                 // define our app using express
 var bodyParser = require('body-parser');
+var fs = require('fs');
 
 var path = require('path')
 var childProcess = require('child_process')
@@ -27,8 +28,11 @@ router.get('/', function(req, res) {
 router.get('/template', function (req, res) {
   res.sendFile(__dirname + '/canvas.html');
 });
+router.get('/svg', function (req, res) {
+  res.sendFile(__dirname + '/tmp/image.svg');
+});
 router.get('/umlviewer', function (req, res) {
-  res.sendFile(__dirname + '/umlviewer.html');
+  res.sendFile(__dirname + '/umlViewer.html');
 });
 router.get('/main.js', function (req, res) {
   res.sendFile(__dirname + '/main.js');
@@ -53,12 +57,20 @@ router.get('/copy', function(req, res) {
     path.join(__dirname, 'copy.js'),
     ''
   ]
-  childProcess.execFile(binPath, childArgs, function(err, stdout, stderr) {
+  childProcess.execFile('phantomjs', childArgs, function(err, stdout, stderr) {
     // handle results
-    // console.log("Output of phantom:" + stdout);
-    // res.json({ message: "Output of phantom:" + stdout });
-    res.sendFile(__dirname + '/tmp/image.' + 'png');
-  })
+    console.log("Output of phantom:" + stdout);
+    console.log("Error of phantom:" + stderr);
+    console.log("Other error:" + err)
+
+    fs.writeFile(__dirname + "/tmp/image.svg", stdout, function(err) {
+        if(err) {
+            return console.log(err);
+        }
+        res.sendFile(__dirname + '/tmp/image.svg');
+        console.log("The file was saved!");
+    });
+  });
 });
 
 // more routes for our API will happen here
